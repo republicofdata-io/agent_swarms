@@ -16,11 +16,9 @@ headers = {
 
 # Query data
 query = {
-    "limit": 10000,
+    "limit": 50,
     "dimensions": [
         "media_conversations.article_url",
-        "media_conversations.article_title",
-        "media_conversations.article_tags",
         "media_conversations.post_natural_key",
         "media_conversations.social_network_profile_username",
         "media_conversations.social_network_profile_location_admin1_name",
@@ -33,7 +31,6 @@ query = {
         "media_conversations.post_like_count",
         "media_conversations.post_retweet_count",
         "media_conversations.post_bookmark_count"
-
     ],
     "timeDimensions": [
         {
@@ -56,11 +53,13 @@ if response.status_code == 200:
     data = response_data.get("data", [])
     transformed_data = {}
 
-    # Iterate through the retrieved data and transform it
+    # Iterate through the retrieved data and group tweets by conversation_natural_key
     for item in data:
         conversation_key = item.get("media_conversations.conversation_natural_key")
+        post_key = item.get("media_conversations.post_natural_key")
         post_data = {
             "post_id": item.get("media_conversations.post_natural_key"),
+            "article_url": item.get("media_conversations.article_url"),
             "post_author": item.get("media_conversations.social_network_profile_username"),
             "post_author_admin1_name": item.get("media_conversations.social_network_profile_location_admin1_name"),
             "post_text": item.get("media_conversations.post_text"),
@@ -72,10 +71,24 @@ if response.status_code == 200:
             "post_retweet_count": item.get("media_conversations.post_retweet_count"),
             "post_bookmark_count": item.get("media_conversations.post_bookmark_count")
         }
-        if conversation_key in transformed_data:
-            transformed_data[conversation_key].append(post_data)
+
+        if conversation_key not in transformed_data:
+            transformed_data[conversation_key] = {
+                "parent": None,
+                "replies": []
+            }
+
+        if conversation_key == post_key:
+            transformed_data[conversation_key]["parent"] = post_data
         else:
-            transformed_data[conversation_key] = [post_data]
+            transformed_data[conversation_key]["replies"].append({
+                "post_text": item.get("media_conversations.post_text"),
+                "post_author": item.get("media_conversations.social_network_profile_username"),
+                "post_author_admin1_name": item.get("media_conversations.social_network_profile_location_admin1_name")
+            })
+
+    # Remove conversations that do not have a parent tweet
+    transformed_data = {key: value for key, value in transformed_data.items() if value["parent"] is not None}
 
     # Generate a unique filename using the current date and time
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
