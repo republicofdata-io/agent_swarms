@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+from datetime import datetime
 
 # Load the environment variable
 auth_key = os.getenv('ROD_AUTH_KEY')
@@ -15,7 +16,7 @@ headers = {
 
 # Query data
 query = {
-    "limit": 100,
+    "limit": 10000,
     "dimensions": [
         "media_conversations.article_url",
         "media_conversations.article_title",
@@ -76,10 +77,14 @@ if response.status_code == 200:
         else:
             transformed_data[conversation_key] = [post_data]
 
+    # Generate a unique filename using the current date and time
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'social_data_{timestamp}.json'
+
     # Save the transformed data to a JSON file
-    with open('transformed_data.json', 'w') as f:
+    with open(filename, 'w') as f:
         json.dump(transformed_data, f, indent=4, sort_keys=True)
 
-    print("Data saved to JSON file.")
+    print("Social data saved to JSON file.")
 else:
     print("Failed to retrieve data:", response.status_code, response.text)
