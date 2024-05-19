@@ -16,7 +16,7 @@ headers = {
 
 # Query data
 query = {
-    "limit": 50,
+    "limit": 10000,
     "dimensions": [
         "media_conversations.article_url",
         "media_conversations.post_natural_key",
