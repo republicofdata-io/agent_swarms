@@ -37,7 +37,7 @@ Incorporate relevant terminology and concepts specific to the task at hand. Use 
 
 ### 10. Advanced Prompt Optimization Techniques
 - Leverage insights from methodologies such as Monte Carlo Tree Search and strategic planning approaches to enhance prompt quality.
-- Utilize error feedback and iterative refinement to produce expert-level prompts, aligning with advanced standards documented in relevant research literature.
+- Utilize error feedback and iterative refinement to produce expert-level prompts, aligning with advanced standards documented in the paper "PromptAgent: Strategic Planning with Language Models Enables Expert-Level Prompt Optimization" (2310.16427.pdf).
 
 ---
 
